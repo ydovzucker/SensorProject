@@ -9,60 +9,51 @@ class Investigationmanager
     {
         int correctGuesses = 0;
 
+        foreach (KeyValuePair<string, int> entry in agent.AttachedSensorsDict)
+        {
+            string sensorName = entry.Key;
+            int numberAttached = entry.Value;
 
-        
-        
-            foreach (KeyValuePair<Sensor, int> entry in agent.AttachedSensorsDict)
+            if (agent.secretWeaknesses.ContainsKey(sensorName))
             {
-                Sensor currSensor = entry.Key;
-                int numberAttached = entry.Value;
-                if (agent.secretWeknesses.ContainsKey(currSensor))
-                {
-                    int numberOfweeknesse = agent.secretWeknesses[currSensor];
-                    correctGuesses += numberOfweeknesse;
-                }
+                int numberOfWeaknesses = agent.secretWeaknesses[sensorName];
+                correctGuesses += numberOfWeaknesses;
             }
-            return correctGuesses;
+        }
 
-            
-
-     }
-    
-
-
-
-
-
-
-
-
-
+        return correctGuesses;
+    }
 
 
     public static Sensor GetSensorFromUserInput()
     {
+        List<Type> sensorTypes = SensorFactory.GetPossibleSensors();
         Console.WriteLine("Choose a sensor to attach by entering its number:");
-        Console.WriteLine("1. MotionSensor");
-        Console.WriteLine("2. HeatSensor");
-        Console.WriteLine("3. CellularSensor");
-        Console.WriteLine("4. ThermalSensor");
-
+        for (int i = 0; i < sensorTypes.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}. {sensorTypes[i].Name}");
+        }
+        
         int choice;
         bool valid = int.TryParse(Console.ReadLine(), out choice);
 
-        if (!valid || choice < 1 || choice > 4)
+        if (!valid || choice < 1 || choice > sensorTypes.Count )
         {
             Console.WriteLine("Invalid choice. Try again.");
             return null;
         }
+        Type selectedType = sensorTypes[choice - 1];
 
-        switch (choice)
+        try
         {
-            case 1: return new MotionSensor();
-            case 2: return new HeatSensor();
-            case 3: return new CellularSensor();
-            case 4: return new ThermalSensor();
-            default: return null;
+            object sensorObject = Activator.CreateInstance(selectedType);
+            Sensor selectedSensor = (Sensor)sensorObject;
+            return selectedSensor;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating sensor instance: {ex.Message}");
+            return null;
         }
     }
 
@@ -72,17 +63,48 @@ class Investigationmanager
         Console.WriteLine("Tracking agents via sensor network...");
         Console.WriteLine("Trust no one. Watch everyone.");
 
-        Sensor selectedSensor = GetSensorFromUserInput();
-        iranianAgent.AttachSensor(selectedSensor);
         int correctGuesses = 0;
-        while (correctGuesses < IranianAgent.possibleSensors.Count())
+
+        while (correctGuesses < iranianAgent.AgentVulnerabilityArray.Length)
         {
-             correctGuesses = EvaluateAgentGuess(iranianAgent);
+            Console.WriteLine("\nChoose an option:");
+            Console.WriteLine("1. Attach a sensor");
+            Console.WriteLine("3. Exit");
 
-            Console.WriteLine($"you  guessed {correctGuesses} out of {iranianAgent.AgentVulnerabilityList.Length} vulnerabilities for Agent {iranianAgent.Name} ");
+            string input = Console.ReadLine();
+
+            if (!int.TryParse(input, out int choice))
+            {
+                Console.WriteLine("Invalid input. Please enter 1, 2 or 3.");
+                continue;  
+            }
+
+            switch (choice)
+            {
+                case 1:
+                    Sensor selectedSensor = GetSensorFromUserInput();
+                    if (selectedSensor == null)
+                    {
+                        
+                        continue;
+                    }
+                    iranianAgent.AttachSensor(selectedSensor);
+                    correctGuesses = EvaluateAgentGuess(iranianAgent);
+                    Console.WriteLine($"You guessed {correctGuesses} out of {iranianAgent.AgentVulnerabilityArray.Length} vulnerabilities for Agent {iranianAgent.Name}");
+                    break;
+
+                
+                case 2:
+                    Console.WriteLine("Exiting the program...");
+                    return;  
+
+                default:
+                    Console.WriteLine("Please select a valid option (1, or 2).");
+                    break;
+            }
         }
-            
 
+        Console.WriteLine("✅ Mission complete. All vulnerabilities discovered.");
     }
 }
 

@@ -15,50 +15,48 @@ public enum AgentRank
 
 abstract class IranianAgent
 {
-    public static Sensor[] allSensors = Sensor.possibleSensors;
+    public static List<Type> allSensors = SensorFactory.GetPossibleSensors();
     public string Name { get; }
     public int Id { get; }
 
-    public Sensor[] AgentVulnerabilityList { get; protected set; }
+    public Sensor[] AgentVulnerabilityArray { get; protected set; }
     public List<Sensor> AttachedSensors { get; } = new List<Sensor>();
-    public Dictionary<Sensor, int> secretWeknesses { get; } = new Dictionary<Sensor, int>();
-
-    public Dictionary<Sensor, int> AttachedSensorsDict { get; } = new Dictionary<Sensor, int>();
+    public Dictionary<string, int> secretWeaknesses { get; } = new Dictionary<string, int>();
+    public Dictionary<string, int> AttachedSensorsDict { get; } = new Dictionary<string, int>();
     public void AttachSensor(Sensor sensor)
     {
         AttachedSensors.Add(sensor);
-        if (AttachedSensorsDict.ContainsKey(sensor))
-        {
-            AttachedSensorsDict[sensor]++;
-            
-        }
+        string sensorName = sensor.GetType().Name;
+
+        if (AttachedSensorsDict.ContainsKey(sensorName))
+            AttachedSensorsDict[sensorName]++;
         else
-        {
-            AttachedSensorsDict[sensor] = 1;
-        }
+            AttachedSensorsDict[sensorName] = 1;
     }
     protected IranianAgent(string name, int id)
     {
         Name = name;
         Id = id;
     }
+    private static Random rnd = new Random();
 
     protected void GenerateRandomVulnerabilities(AgentRank rank)
     {
-        Random rnd = new Random();
         int count = (int)rank;
-
-        AgentVulnerabilityList = new Sensor[count];
+        AgentVulnerabilityArray = new Sensor[count];
 
         for (int i = 0; i < count; i++)
         {
-            Sensor chosen = allSensors[rnd.Next(allSensors.Length)];
-            AgentVulnerabilityList[i] = chosen;
+            Type randomSensorType = allSensors[rnd.Next(allSensors.Count)];
+            Sensor sensor = (Sensor)Activator.CreateInstance(randomSensorType);
+            AgentVulnerabilityArray[i] = sensor;
 
-            if (secretWeknesses.ContainsKey(chosen))
-                secretWeknesses[chosen]++;
+            string sensorName = sensor.GetType().Name;
+
+            if (secretWeaknesses.ContainsKey(sensorName))
+                secretWeaknesses[sensorName]++;
             else
-                secretWeknesses[chosen] = 1;
+                secretWeaknesses[sensorName] = 1;
         }
     }
 }
