@@ -11,8 +11,10 @@ namespace Agent.Agents
     {
         Junior = 2,
         SectionChief = 4,
+        CounterAttackIranianAgent = 4,
         UnitCommander = 6,
         HighCommander = 8
+        
 
     }
 
@@ -23,9 +25,9 @@ namespace Agent.Agents
         public int Id { get; }
 
         public Sensor[] AgentVulnerabilityArray { get; protected set; }
-        public List<Sensor> AttachedSensors { get; } = new List<Sensor>();
+        public  List<Sensor> AttachedSensors { get; } = new List<Sensor>();
         public Dictionary<string, int> secretWeaknesses { get; } = new Dictionary<string, int>();
-        public Dictionary<string, int> AttachedSensorsDict { get; } = new Dictionary<string, int>();
+        public  Dictionary<string, int> AttachedSensorsDict { get; } = new Dictionary<string, int>();
         public void AttachSensor(Sensor sensor)
         {
             AttachedSensors.Add(sensor);

@@ -14,7 +14,6 @@ namespace Agent.Manager
         public static int EvaluateAgentGuess(IranianAgent agent)
         {
             int correctGuesses = 0;
-
             Dictionary<string, int> activeSensorsCount = new Dictionary<string, int>();
 
             foreach (Sensor sensor in agent.AttachedSensors)
@@ -22,17 +21,18 @@ namespace Agent.Manager
                 try
                 {
                     bool isActive = sensor.Activate(true);
+                    string sensorName = sensor.GetType().Name;
+
                     if (isActive)
                     {
-                        string sensorName = sensor.GetType().Name;
                         if (activeSensorsCount.ContainsKey(sensorName))
                             activeSensorsCount[sensorName]++;
                         else
                             activeSensorsCount[sensorName] = 1;
                     }
-                    else
+                    else if (sensorName == "PulseSensor")
                     {
-                        Console.WriteLine($"Sensor {sensor.GetType().Name} is broken and cannot be activated.");
+                        Console.WriteLine($"Sensor {sensorName} is broken and cannot be activated.");
                     }
                 }
                 catch (Exception ex)
@@ -46,15 +46,15 @@ namespace Agent.Manager
                 string sensorName = entry.Key;
                 int numberActive = entry.Value;
 
-                if (agent.secretWeaknesses.ContainsKey(sensorName))
+                if (agent.secretWeaknesses.TryGetValue(sensorName, out int numberOfWeaknesses))
                 {
-                    int numberOfWeaknesses = agent.secretWeaknesses[sensorName];
                     correctGuesses += Math.Min(numberActive, numberOfWeaknesses);
                 }
             }
 
             return correctGuesses;
         }
+
         public void ActivateSensor(Sensor sensor)
         {
             sensor.Activate(true);

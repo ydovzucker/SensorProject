@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Agents\CounterAttackIranianAgent.cs" />
     <Compile Include="Agents\HighCommand.cs" />
     <Compile Include="Sensors\CellularSensor.cs" />
     <Compile Include="Sensors\HeatSensor.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Agents\SectionChief.cs" />
+    <Compile Include="Sensors\PulseSensor.cs" />
     <Compile Include="Sensors\Sensor.cs" />
     <Compile Include="Sensors\SensorFactory.cs" />
     <Compile Include="Sensors\ThermalSensor.cs" />
